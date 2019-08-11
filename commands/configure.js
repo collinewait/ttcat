@@ -20,7 +20,7 @@ const configure = {
         validate: util.notEmpty,
       },
     ]);
-    await credentialsManager.storeKeyAndSecret(answers.key, answers.secret);
+    await credentialsManager.storeKeyAndSecret('apiKey', answers.key, answers.secret);
   },
 };
 
