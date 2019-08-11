@@ -1,0 +1,23 @@
+{
+  "name": "twitter-client-cli-nodejs",
+  "version": "1.0.0",
+  "description": "Twitter client",
+  "bin": {
+    "ttcat": "./bin/ttcat.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/collinewait/twitter-client-cli-nodejs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/collinewait/twitter-client-cli-nodejs/issues"
+  },
+  "homepage": "https://github.com/collinewait/twitter-client-cli-nodejs#readme"
+}
