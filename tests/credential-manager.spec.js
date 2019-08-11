@@ -14,9 +14,8 @@ describe('a credential manager', () => {
     credentialManager = new CredentialManager('ttcat-test');
   });
 
-  after(() => {
-    credentialManager.conf.delete('apiKey');
-    credentialManager.conf.delete('apiSecret');
+  after(async () => {
+    await credentialManager.clearKeyAndSecret();
   });
 
   context('with no existing credentials', () => {

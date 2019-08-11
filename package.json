@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "configstore": "^5.0.0",
-    "inquirer": "^6.5.0"
+    "inquirer": "^6.5.0",
+    "keytar": "^5.0.0-beta.0"
   }
 }
