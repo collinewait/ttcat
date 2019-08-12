@@ -30,7 +30,7 @@ describe('the configure module', () => {
       .stub(inquirer, 'prompt')
       .resolves({ key: 'testKey', secret: 'testSecret' });
     await configure.consumer('ttcat-test');
-    const [key, secret] = await credentialsManager.getKeyAndSecret('apiKey');
+    const [key, secret] = await credentialsManager.getKeyAndSecret('consumer');
     expect(key).to.equal('testKey');
     expect(secret).to.equal('testSecret');
     expect(inquirer.prompt.calledOnce).to.be.true();
@@ -41,7 +41,7 @@ describe('the configure module', () => {
       .stub(inquirer, 'prompt')
       .resolves({ key: 'differentTestKey', secret: 'differentTestSecret' });
     await configure.consumer('ttcat-test');
-    const [key, secret] = await credentialsManager.getKeyAndSecret('apiKey');
+    const [key, secret] = await credentialsManager.getKeyAndSecret('consumer');
     expect(key).to.equal('differentTestKey');
     expect(secret).to.equal('differentTestSecret');
     expect(inquirer.prompt.calledOnce).to.be.true();
@@ -72,7 +72,7 @@ describe('the configure module', () => {
     await configure.account('ttcat-test');
     CredentialManager.prototype.getKeyAndSecret.restore();
     const [token, secret] = await credentialsManager.getKeyAndSecret(
-      'accountToken',
+      'account',
     );
     expect(token).to.equal('hij');
     expect(secret).to.equal('klm');

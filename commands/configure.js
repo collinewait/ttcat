@@ -24,7 +24,7 @@ const configure = {
       },
     ]);
     await credentialsManager.storeKeyAndSecret(
-      'apiKey',
+      'consumer',
       answers.key,
       answers.secret,
     );
@@ -32,10 +32,10 @@ const configure = {
 
   async account(name) {
     const credentialManager = new CredentialManager(name);
-    const [apiKey, apiSecret] = await credentialManager.getKeyAndSecret(
-      'apiKey',
+    const [consumer, apiSecret] = await credentialManager.getKeyAndSecret(
+      'consumer',
     );
-    const twitter = new Twitter(apiKey, apiSecret);
+    const twitter = new Twitter(consumer, apiSecret);
     const response = querystring.parse(
       await twitter.post('oauth/request_token'),
     );
@@ -72,7 +72,7 @@ const configure = {
       '1.1/account/verify_credentials.json',
     );
     await credentialManager.storeKeyAndSecret(
-      'accountToken',
+      'account',
       tokenReposnse.oauth_token,
       tokenReposnse.oauth_token_secret,
     );

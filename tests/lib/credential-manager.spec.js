@@ -15,15 +15,19 @@ describe('the credential manager', () => {
   });
 
   it('should return credentials when they are found', async () => {
-    await credentialManager.storeKeyAndSecret('apiKey', 'apiTestKey', 'apiTestSecret');
-    const [key, secret] = await credentialManager.getKeyAndSecret('apiKey');
+    await credentialManager.storeKeyAndSecret(
+      'consumer',
+      'apiTestKey',
+      'apiTestSecret',
+    );
+    const [key, secret] = await credentialManager.getKeyAndSecret('consumer');
     expect(key).to.equal('apiTestKey');
     expect(secret).to.equal('apiTestSecret');
   });
 
   it('should reject when no credentials are found', async () => {
-    await credentialManager.clearKeyAndSecret('apiKey');
-    expect(credentialManager.getKeyAndSecret('apiKey')).to.be.rejected();
+    await credentialManager.clearKeyAndSecret('consumer');
+    expect(credentialManager.getKeyAndSecret('consumer')).to.be.rejected();
   });
 
   after(done => {
