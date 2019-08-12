@@ -1,7 +1,10 @@
+const querystring = require('querystring');
+
 const inquirer = require('inquirer');
 
 const CredentialManager = require('../lib/credential-manager');
 const util = require('../lib/util');
+const Twitter = require('../lib/twitter');
 
 const configure = {
   async consumer(name) {
@@ -20,7 +23,60 @@ const configure = {
         validate: util.notEmpty,
       },
     ]);
-    await credentialsManager.storeKeyAndSecret('apiKey', answers.key, answers.secret);
+    await credentialsManager.storeKeyAndSecret(
+      'apiKey',
+      answers.key,
+      answers.secret,
+    );
+  },
+
+  async account(name) {
+    const credentialManager = new CredentialManager(name);
+    const [apiKey, apiSecret] = await credentialManager.getKeyAndSecret(
+      'apiKey',
+    );
+    const twitter = new Twitter(apiKey, apiSecret);
+    const response = querystring.parse(
+      await twitter.post('oauth/request_token'),
+    );
+    twitter.setToken(response.oauth_token, response.oauth_token_secret);
+    await inquirer.prompt({
+      type: 'input',
+      message:
+        'Press enter to open Twitter in your default browser to authorize access',
+      name: 'continue',
+    });
+
+    util.openBrowser(
+      `${twitter.baseUrl}oauth/authorize?oauth_token=${response.oauth_token}`,
+    );
+    const answers = await inquirer.prompt({
+      type: 'input',
+      message: 'Enter the pin provided by Twitter',
+      name: 'pin',
+      validate: util.notEmpty,
+    });
+
+    const tokenReposnse = querystring.parse(
+      await twitter.post(
+        'oauth/access_token',
+        `oauth_verifier=${answers.pin}`,
+      ),
+    );
+    twitter.setToken(
+      tokenReposnse.oauth_token,
+      tokenReposnse.oauth_token_secret,
+    );
+
+    const verifyResponse = await twitter.get(
+      '1.1/account/verify_credentials.json',
+    );
+    await credentialManager.storeKeyAndSecret(
+      'accountToken',
+      tokenReposnse.oauth_token,
+      tokenReposnse.oauth_token_secret,
+    );
+    console.log(`Account "${verifyResponse.screen_name}" successfully added`);
   },
 };
 
