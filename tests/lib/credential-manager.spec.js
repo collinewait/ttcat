@@ -14,6 +14,23 @@ describe('the credential manager', () => {
     credentialManager = new CredentialManager('ttcat-test');
   });
 
+  it('should return credentials set in the environment', async () => {
+    process.env['TTCAT-TEST_CONSUMER_KEY'] = 'one';
+    process.env['TTCAT-TEST_CONSUMER_SECRET'] = 'two';
+    const [key, secret] = await credentialManager.getKeyAndSecret('consumer');
+    expect(key).to.equal('one');
+    expect(secret).to.equal('two');
+  });
+
+  it('should prefer credentials set in the environment', async () => {
+    await credentialManager.storeKeyAndSecret('consumer', 'foo', 'boom');
+    const [key, secret] = await credentialManager.getKeyAndSecret('consumer');
+    expect(key).to.equal('one');
+    expect(secret).to.equal('two');
+    delete process.env['TTCAT-TEST_CONSUMER_KEY'];
+    delete process.env['TTCAT-TEST_CONSUMER_SECRET'];
+  });
+
   it('should return credentials when they are found', async () => {
     await credentialManager.storeKeyAndSecret(
       'consumer',
@@ -33,7 +50,7 @@ describe('the credential manager', () => {
   });
 
   it('should reject when no secret is found', async () => {
-    credentialManager.conf.set('keys.consumer', 'foo');
+    credentialManager.conf.set('keys.consumer', 'foom');
     await expect(
       credentialManager.getKeyAndSecret('consumer'),
     ).to.be.rejectedWith('Missing consumer secret');
