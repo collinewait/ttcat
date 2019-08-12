@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 
@@ -25,20 +25,41 @@ describe('the credential manager', () => {
     expect(secret).to.equal('apiTestSecret');
   });
 
-  it('should reject when no credentials are found', async () => {
+  it('should reject when no key is found', async () => {
     await credentialManager.clearKeyAndSecret('consumer');
-    expect(credentialManager.getKeyAndSecret('consumer')).to.be.rejected();
+    expect(credentialManager.getKeyAndSecret('consumer')).to.be.rejectedWith(
+      'Missing consumer key',
+    );
   });
 
-  after(done => {
-    fs.unlink(
+  it('should reject when no secret is found', async () => {
+    credentialManager.conf.set('keys.consumer', 'foo');
+    await expect(
+      credentialManager.getKeyAndSecret('consumer'),
+    ).to.be.rejectedWith('Missing consumer secret');
+    credentialManager.conf.delete('keys.consumer');
+  });
+
+  it('should remove all credentials', async () => {
+    await credentialManager.storeKeyAndSecret('consumer', 'one', 'two');
+    await credentialManager.storeKeyAndSecret('account', 'three', 'four');
+    await credentialManager.clearAll();
+    await expect(
+      credentialManager.getKeyAndSecret('consumer'),
+    ).to.be.rejected();
+    await expect(
+      credentialManager.getKeyAndSecret('account'),
+    ).to.be.rejected();
+  });
+  after(async () => {
+    await credentialManager.clearAll();
+    await fs.unlink(
       path.join(
         process.env.HOME,
         '.config',
         'configstore',
         'ttcat-test.json',
       ),
-      done,
     );
   });
 });

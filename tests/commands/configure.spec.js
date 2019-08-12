@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const sinon = require('sinon');
@@ -30,7 +30,9 @@ describe('the configure module', () => {
       .stub(inquirer, 'prompt')
       .resolves({ key: 'testKey', secret: 'testSecret' });
     await configure.consumer('ttcat-test');
-    const [key, secret] = await credentialsManager.getKeyAndSecret('consumer');
+    const [key, secret] = await credentialsManager.getKeyAndSecret(
+      'consumer',
+    );
     expect(key).to.equal('testKey');
     expect(secret).to.equal('testSecret');
     expect(inquirer.prompt.calledOnce).to.be.true();
@@ -41,7 +43,9 @@ describe('the configure module', () => {
       .stub(inquirer, 'prompt')
       .resolves({ key: 'differentTestKey', secret: 'differentTestSecret' });
     await configure.consumer('ttcat-test');
-    const [key, secret] = await credentialsManager.getKeyAndSecret('consumer');
+    const [key, secret] = await credentialsManager.getKeyAndSecret(
+      'consumer',
+    );
     expect(key).to.equal('differentTestKey');
     expect(secret).to.equal('differentTestSecret');
     expect(inquirer.prompt.calledOnce).to.be.true();
@@ -68,7 +72,7 @@ describe('the configure module', () => {
       .onSecondCall()
       .resolves({ pin: 1234 });
     sandbox.stub(utill, 'openBrowser').returns('');
-    sandbox.spy(console, 'log');
+    sandbox.stub(console, 'log');
     await configure.account('ttcat-test');
     CredentialManager.prototype.getKeyAndSecret.restore();
     const [token, secret] = await credentialsManager.getKeyAndSecret(
@@ -80,15 +84,15 @@ describe('the configure module', () => {
       console.log.calledWith('Account "foo" successfully added'),
     ).to.be.true();
   });
-  after(done => {
-    fs.unlink(
+  after(async () => {
+    await credentialsManager.clearAll();
+    await fs.unlink(
       path.join(
         process.env.HOME,
         '.config',
         'configstore',
         'ttcat-test.json',
       ),
-      done,
     );
   });
 });
