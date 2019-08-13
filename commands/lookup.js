@@ -39,6 +39,9 @@ const lookup = {
   async users(...args) {
     await doLookup('1.1/users/lookup.json?screen_name=', ...args);
   },
+  async statuses(...args) {
+    await doLookup('1.1/statuses/lookup.json?id=', ...args);
+  },
 };
 
 module.exports = lookup;

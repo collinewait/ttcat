@@ -11,6 +11,11 @@ program
   .description('Find users by their screen names')
   .action(names => lookup.users(pkg.name, names).catch(util.handleError));
 
+program
+  .command('statuses [ids]')
+  .description('Find statuses (tweets) by their ID')
+  .action(ids => lookup.statuses(pkg.name, ids).catch(util.handleError));
+
 program.parse(process.argv);
 
 if (!process.argv.slice(2).length) {
