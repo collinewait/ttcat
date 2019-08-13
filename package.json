@@ -49,6 +49,7 @@
     "parallel-transform": "^1.1.0",
     "promise-streams": "^2.1.1",
     "split2": "^3.1.1",
-    "through2": "^3.0.1"
+    "through2": "^3.0.1",
+    "update-notifier": "^3.0.1"
   }
 }
