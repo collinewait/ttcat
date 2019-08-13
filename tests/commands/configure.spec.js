@@ -3,6 +3,8 @@ const fs = require('fs-extra');
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const sinon = require('sinon');
+const keytar = require('keytar');
+const _ = require('lodash');
 const inquirer = require('inquirer');
 
 const configure = require('../../commands/configure');
@@ -17,9 +19,24 @@ const { expect } = chai;
 chai.use(dirtyChai);
 
 describe('the configure module', () => {
+  const secrets = {};
   let credentialsManager;
   let sandbox;
   before(() => {
+    sinon.stub(keytar, 'setPassword').callsFake((service, key, secret) => {
+      _.set(secrets, `${service}.${key}`, secret);
+      return Promise.resolve();
+    });
+    sinon.stub(keytar, 'getPassword').callsFake((service, key) => {
+      const value = _.get(secrets, `${service}.${key}`);
+      return value
+        ? Promise.resolve(value)
+        : Promise.reject(new Error('Missing consumer secret'));
+    });
+    sinon.stub(keytar, 'deletePassword').callsFake((service, key) => {
+      _.unset(secrets, `${service}.${key}`);
+      return Promise.resolve();
+    });
     credentialsManager = new CredentialManager('ttcat-test');
   });
   beforeEach(() => {
@@ -86,6 +103,9 @@ describe('the configure module', () => {
   });
   after(async () => {
     await credentialsManager.clearAll();
+    keytar.deletePassword.restore();
+    keytar.setPassword.restore();
+    keytar.getPassword.restore();
     await fs.unlink(
       path.join(
         process.env.HOME,

@@ -1,5 +1,8 @@
 const path = require('path');
 const fs = require('fs-extra');
+const sinon = require('sinon');
+const keytar = require('keytar');
+const _ = require('lodash');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 
@@ -9,8 +12,23 @@ chai.use(chaiAsPromised);
 const CredentialManager = require('../../lib/credential-manager');
 
 describe('the credential manager', () => {
+  const secrets = {};
   let credentialManager;
   before(() => {
+    sinon.stub(keytar, 'setPassword').callsFake((service, key, secret) => {
+      _.set(secrets, `${service}.${key}`, secret);
+      return Promise.resolve();
+    });
+    sinon.stub(keytar, 'getPassword').callsFake((service, key) => {
+      const value = _.get(secrets, `${service}.${key}`);
+      return value
+        ? Promise.resolve(value)
+        : Promise.reject(new Error('Missing consumer secret'));
+    });
+    sinon.stub(keytar, 'deletePassword').callsFake((service, key) => {
+      _.unset(secrets, `${service}.${key}`);
+      return Promise.resolve();
+    });
     credentialManager = new CredentialManager('ttcat-test');
   });
 
@@ -70,6 +88,9 @@ describe('the credential manager', () => {
   });
   after(async () => {
     await credentialManager.clearAll();
+    keytar.deletePassword.restore();
+    keytar.setPassword.restore();
+    keytar.getPassword.restore();
     await fs.unlink(
       path.join(
         process.env.HOME,
