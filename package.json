@@ -5,7 +5,9 @@
   "bin": {
     "ttcat": "./bin/ttcat.js"
   },
-  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "nyc mocha 'tests/**/*.spec.js'"
   },

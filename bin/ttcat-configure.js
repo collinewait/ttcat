@@ -8,12 +8,12 @@ program.version(pkg.version);
 program
   .command('consumer')
   .description('Add a twitter API key and secret')
-  .action(() => configure.consumer(pkg.name).catch(util.handleError));
+  .action(() => configure.consumer(util.extractName(pkg.name)).catch(util.handleError));
 
 program
   .command('account')
   .description('Authorize access to a Twitter account')
-  .action(() => configure.account(pkg.name).catch(util.handleError));
+  .action(() => configure.account(util.extractName(pkg.name)).catch(util.handleError));
 
 program.parse(process.argv);
 
