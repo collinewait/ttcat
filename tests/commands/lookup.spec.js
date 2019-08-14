@@ -32,52 +32,48 @@ describe('the lookup module', () => {
         return Promise.resolve(response);
       });
     });
-    // TODO: Fix the tests commented out. They pass after removing JSONStream
-    // in the lookup command but it breaks the functionality since we have to stringify
-    // the object returned.
 
-    // it('should look up users piped to stdin', done => {
-    //   const stdin = new ObjectReadableMock(['foo\n', 'bar\n'], {
-    //     objectMode: true,
-    //   });
-    //   const stdout = new ObjectWritableMock();
-    //   lookup.users('ttcat-test', null, { stdin, stdout });
-    //   stdout.on('finish', () => {
-    //     console.log('dddddd', stdout.data);
-    //     expect(stdout.data).to.deep.equal([
-    //       { screen_name: 'foo' },
-    //       { screen_name: 'bar' },
-    //     ]);
-    //     done();
-    //   });
-    // });
+    it('should look up users piped to stdin', done => {
+      const stdin = new ObjectReadableMock(['foo\n', 'bar\n'], {
+        objectMode: true,
+      });
+      const stdout = new ObjectWritableMock();
+      lookup.users('ttcat-test', null, { stdin, stdout });
+      stdout.on('finish', () => {
+        expect(JSON.parse(stdout.data.join(''))).to.deep.equal([
+          { screen_name: 'foo' },
+          { screen_name: 'bar' },
+        ]);
+        done();
+      });
+    });
 
-    // it('should lookup more than 100 users pined to stdin', done => {
-    //   const users = [...Array(101).keys()].map(n => `foo${n}`);
-    //   const stdin = new ObjectReadableMock(users.map(u => `${u}\n`), {
-    //     objectMode: true,
-    //   });
-    //   const stdout = new ObjectWritableMock();
-    //   lookup.users('ttcat-test', null, { stdin, stdout });
-    //   stdout.on('finish', () => {
-    //     expect(stdout.data)
-    //       .to.deep
-    //       .equal(users.map(u => ({ screen_name: u })));
-    //     done();
-    //   });
-    // });
+    it('should lookup more than 100 users pined to stdin', done => {
+      const users = [...Array(101).keys()].map(n => `foo${n}`);
+      const stdin = new ObjectReadableMock(users.map(u => `${u}\n`), {
+        objectMode: true,
+      });
+      const stdout = new ObjectWritableMock();
+      lookup.users('ttcat-test', null, { stdin, stdout });
+      stdout.on('finish', () => {
+        expect(JSON.parse(stdout.data.join('')))
+          .to.deep
+          .equal(users.map(u => ({ screen_name: u })));
+        done();
+      });
+    });
 
-    // it('should lookup users from the command line', done => {
-    //   const stdout = new ObjectWritableMock();
-    //   lookup.users('ttcat-test', 'foo,bar', { stdout });
-    //   stdout.on('finish', () => {
-    //     expect(stdout.data).to.deep.equal([
-    //       { screen_name: 'foo' },
-    //       { screen_name: 'bar' },
-    //     ]);
-    //     done();
-    //   });
-    // });
+    it('should lookup users from the command line', done => {
+      const stdout = new ObjectWritableMock();
+      lookup.users('ttcat-test', 'foo,bar', { stdout });
+      stdout.on('finish', () => {
+        expect(JSON.parse(stdout.data.join(''))).to.deep.equal([
+          { screen_name: 'foo' },
+          { screen_name: 'bar' },
+        ]);
+        done();
+      });
+    });
 
     it('should reject on error', async () => {
       Twitter.prototype.get.restore();
