@@ -1,6 +1,6 @@
 {
-  "name": "ttcat",
-  "version": "1.0.1",
+  "name": "@collinewait/ttcat",
+  "version": "1.0.2",
   "description": "Twitter client",
   "bin": {
     "ttcat": "./bin/ttcat.js"
