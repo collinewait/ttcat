@@ -2,7 +2,10 @@
 
 A command line Twitter client
 
-I created this app while taking a pluralsight course "Building Command Line Applications in Node.js"
+[![Build Status](https://travis-ci.org/collinewait/ttcat.svg?branch=master)](https://travis-ci.org/collinewait/ttcat)
+
+I created this app while taking a pluralsight course "Building Command Line Applications in Node.js".
+
 You can install the latest version by running npm install @collinewait/ttcat.
 
 To use the ttcat CLI:
